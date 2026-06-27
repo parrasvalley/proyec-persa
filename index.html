@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Proyeccion Organico/Convencional - Parras Valley</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0d1a2b;color:#e8f0fa;font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh;}
+    .hdr{background:linear-gradient(135deg,#0a1f3d 0%,#1a3a5c 50%,#0d2030 100%);border-bottom:3px solid #42a5f5;padding:16px 20px 0;}
+    .hdr-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .hdr-icon{font-size:44px;line-height:1;filter:drop-shadow(0 3px 8px rgba(66,165,245,0.5));}
+    .hdr-title{font-size:clamp(18px,5vw,28px);font-weight:900;color:#90caf9;letter-spacing:1px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+    .hdr-sub{font-size:11px;color:#64b5f6;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+    .view-tabs{display:flex;gap:0;}
+    .view-tab{flex:1;padding:10px 8px;border:none;background:rgba(0,0,0,0.25);font-family:system-ui;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:#64b5f6;border-top:2px solid transparent;}
+    .view-tab.active{background:rgba(144,202,249,0.12);color:#90caf9;border-top:3px solid #90caf9;}
+    .wrap{max-width:960px;margin:0 auto;padding:20px 16px 60px;}
+    .dias-tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;}
+    .dia-btn{flex-shrink:0;padding:8px 14px;border:2px solid rgba(66,165,245,0.3);border-radius:20px;background:transparent;font-family:system-ui;font-size:12px;font-weight:700;cursor:pointer;color:#64b5f6;}
+    .dia-btn.active{background:linear-gradient(135deg,#1565c0,#42a5f5);border-color:#42a5f5;color:#fff;box-shadow:0 4px 14px rgba(66,165,245,0.4);}
+    .sec{font-size:10px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#64b5f6;margin:20px 0 10px;display:flex;align-items:center;gap:10px;}
+    .sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(66,165,245,0.5),transparent);}
+    /* Divisor organico/convencional */
+    .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+    .tipo-head{padding:8px 14px;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;border-radius:10px 10px 0 0;text-align:center;}
+    .tipo-head.org{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#a8e063;border:2px solid rgba(168,224,99,0.3);border-bottom:none;}
+    .tipo-head.conv{background:linear-gradient(135deg,#1a237e,#1565c0);color:#90caf9;border:2px solid rgba(144,202,249,0.3);border-bottom:none;}
+    .tipo-body{border-radius:0 0 10px 10px;padding:12px;}
+    .tipo-body.org{background:rgba(27,94,32,0.15);border:2px solid rgba(168,224,99,0.2);border-top:none;}
+    .tipo-body.conv{background:rgba(21,101,192,0.15);border:2px solid rgba(144,202,249,0.2);border-top:none;}
+    /* Ranchos */
+    .rancho-card{border:2px solid rgba(66,165,245,0.2);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+    .rancho-head{background:linear-gradient(135deg,#0d2746,#1a3a5c);padding:10px 14px;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#90caf9;}
+    .rancho-body{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .tipo-label{font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding:4px 8px;border-radius:6px;text-align:center;}
+    .tipo-label.org{background:rgba(168,224,99,0.1);color:#a8e063;border:1px solid rgba(168,224,99,0.2);}
+    .tipo-label.conv{background:rgba(144,202,249,0.1);color:#90caf9;border:1px solid rgba(144,202,249,0.2);}
+    .f label{display:block;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#546e7a;margin-bottom:4px;}
+    .f input{width:100%;border:2px solid rgba(66,165,245,0.2);border-radius:7px;padding:7px 8px;font-family:system-ui;font-size:15px;font-weight:800;background:rgba(0,0,0,0.3);color:#e8f0fa;outline:none;}
+    .f input:focus{border-color:#42a5f5;background:rgba(66,165,245,0.06);}
+    .f input.org{border-color:rgba(168,224,99,0.25);}
+    .f input.org:focus{border-color:#a8e063;}
+    .f input::placeholder{color:rgba(255,255,255,0.15);font-weight:400;}
+    .rancho-result{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-top:1px solid rgba(66,165,245,0.15);}
+    .rr{padding:8px 6px;text-align:center;border-right:1px solid rgba(66,165,245,0.1);}
+    .rr:last-child{border-right:none;}
+    .rr-label{font-size:7px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+    .rr-val{font-size:16px;font-weight:900;}
+    /* Totales */
+    .tot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    .tot-card{border-radius:12px;padding:12px;text-align:center;border:2px solid;}
+    .tot-card.rejas{background:rgba(33,33,33,0.3);border-color:rgba(120,120,120,0.3);}
+    .tot-card.org1{background:rgba(27,94,32,0.2);border-color:rgba(168,224,99,0.3);}
+    .tot-card.org2{background:rgba(52,73,0,0.2);border-color:rgba(205,220,57,0.3);}
+    .tot-card.conv{background:rgba(21,101,192,0.15);border-color:rgba(144,202,249,0.3);}
+    .tot-label{font-size:8px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+    .tot-card.rejas .tot-label{color:#9e9e9e;}
+    .tot-card.org1 .tot-label{color:#a8e063;}
+    .tot-card.org2 .tot-label{color:#cddc39;}
+    .tot-card.conv .tot-label{color:#90caf9;}
+    .tot-val{font-size:clamp(18px,3vw,26px);font-weight:900;}
+    .tot-card.rejas .tot-val{color:#bdbdbd;}
+    .tot-card.org1 .tot-val{color:#a8e063;}
+    .tot-card.org2 .tot-val{color:#cddc39;}
+    .tot-card.conv .tot-val{color:#90caf9;}
+    .tot-sub{font-size:9px;margin-top:3px;opacity:0.6;}
+    /* Pedidos/Inv tablas */
+    .pi-outer{border-radius:12px;overflow:hidden;border:2px solid;}
+    .pi-outer.org{border-color:rgba(168,224,99,0.25);}
+    .pi-outer.conv{border-color:rgba(144,202,249,0.25);}
+    .pi-outer-head{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .pi-outer.org .pi-outer-head{background:rgba(27,94,32,0.3);color:#a8e063;}
+    .pi-outer.conv .pi-outer-head{background:rgba(21,101,192,0.3);color:#90caf9;}
+    .pi-inner-grid{display:grid;grid-template-columns:1fr 1fr;}
+    .pi-card{overflow:hidden;}
+    .pi-card.sec-head{font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;}
+    table{width:100%;border-collapse:collapse;table-layout:fixed;}
+    th{font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#546e7a;padding:4px 7px;border-bottom:1px solid rgba(66,165,245,0.1);text-align:right;}
+    th:first-child{text-align:left;width:38%;}
+    td{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,0.04);text-align:right;font-size:12px;}
+    td:first-child{text-align:left;font-size:11px;font-weight:700;color:#b0bec5;}
+    td input{width:100%;border:1.5px solid rgba(66,165,245,0.2);border-radius:5px;padding:3px 5px;font-family:system-ui;font-size:13px;font-weight:800;text-align:right;background:rgba(0,0,0,0.25);color:#e8f0fa;outline:none;}
+    td input:focus{border-color:#42a5f5;}
+    .total-row td{font-weight:900;font-size:12px;background:rgba(66,165,245,0.06);border-top:1.5px solid rgba(66,165,245,0.15)!important;}
+    /* Cruce */
+    .cruce-outer{border:2px solid rgba(66,165,245,0.3);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+    .cruce-outer-head{background:linear-gradient(135deg,rgba(13,39,70,0.8),rgba(26,58,92,0.8));padding:10px 16px;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#64b5f6;display:flex;justify-content:space-between;align-items:center;}
+    .cruce-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+    .cruce-cell{padding:12px 14px;border-right:1px solid rgba(66,165,245,0.1);}
+    .cruce-cell:last-child{border-right:none;}
+    .cruce-cell.org{background:rgba(27,94,32,0.12);}
+    .cruce-cell.conv{background:rgba(21,101,192,0.08);}
+    .cruce-label{font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+    .cruce-cell.org .cruce-label{color:#a8e063;}
+    .cruce-cell.conv .cruce-label{color:#90caf9;}
+    .cruce-val{font-size:clamp(16px,2.5vw,22px);font-weight:900;margin-bottom:5px;}
+    .cruce-sub{font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;}
+    .cruce-diff{font-size:13px;font-weight:900;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);}
+    .alerta-org-conv{background:rgba(255,165,0,0.12);border:2px solid rgba(255,165,0,0.4);border-radius:10px;padding:10px 14px;margin-top:8px;font-size:11px;color:#ffb74d;font-weight:700;}
+    /* Semanal */
+    .sem-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .sem-table th{font-size:8px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#546e7a;padding:7px 8px;border-bottom:2px solid rgba(66,165,245,0.3);text-align:right;}
+    .sem-table th:first-child{text-align:left;}
+    .sem-table th.org{color:#a8e063;}
+    .sem-table th.conv{color:#90caf9;}
+    .sem-table td{padding:8px;border-bottom:1px solid rgba(66,165,245,0.07);text-align:right;cursor:pointer;}
+    .sem-table td:first-child{text-align:left;font-weight:800;color:#b0bec5;font-size:11px;}
+    .sem-table tr:hover td{background:rgba(66,165,245,0.05);}
+    .sem-table tr.dia-activo td{background:rgba(66,165,245,0.08);}
+    .sem-table .total-sem td{font-weight:900;font-size:13px;background:linear-gradient(135deg,rgba(13,39,70,0.7),rgba(10,18,40,0.9));color:#90caf9;border-bottom:none;border-top:2px solid rgba(66,165,245,0.4);}
+    /* Balance card dia */
+    .bal-dia-card{border-radius:12px;padding:10px;cursor:pointer;text-align:center;border:2px solid;}
+    /* Cierre */
+    .cierre-card{background:linear-gradient(135deg,rgba(13,39,70,0.6),rgba(10,18,40,0.8));border:2px solid rgba(66,165,245,0.4);border-radius:16px;padding:18px;margin-bottom:16px;}
+    .cierre-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .cierre-item{background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;border:1px solid rgba(66,165,245,0.15);}
+    /* BTN */
+    .btn-nueva{width:100%;padding:13px;margin-top:16px;border:2px solid rgba(66,165,245,0.3);border-radius:12px;background:rgba(21,101,192,0.15);color:#90caf9;font-family:system-ui;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
+    .confirm-box{margin-top:16px;padding:14px;background:rgba(183,28,28,0.15);border:2px solid rgba(239,83,80,0.4);border-radius:12px;}
+    .confirm-btns{display:flex;gap:10px;margin-top:10px;}
+    .btn-cancel{flex:1;padding:10px;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.05);font-family:system-ui;font-size:12px;font-weight:700;cursor:pointer;color:#9e9e9e;}
+    .btn-confirm{flex:1;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg,#b71c1c,#ef5350);font-family:system-ui;font-size:12px;font-weight:800;cursor:pointer;color:#fff;}
+    .hist-card{background:rgba(13,39,70,0.3);border:2px solid rgba(66,165,245,0.2);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+    .hint{font-size:10px;color:#64b5f6;margin:10px 0;letter-spacing:1px;opacity:0.7;}
+    .empty{text-align:center;padding:50px;color:#546e7a;font-size:14px;}
+    @media(max-width:600px){
+      .tot-grid{grid-template-columns:1fr 1fr;}
+      .tipo-grid{grid-template-columns:1fr;}
+      .cruce-inner{grid-template-columns:1fr;}
+      .cierre-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+var useState=React.useState;
+
+var RANCHOS=[
+  {id:"f4h",nombre:"Forrajera 4 Hermanos"},
+  {id:"pvt",nombre:"Parras Valley Tomatoes"},
+  {id:"crp",nombre:"Cordillera Real de Parras"}
+];
+var PRES=[
+  {id:"p20",label:"20 lb",peso:9.25},
+  {id:"p8x2",label:"8x2 lb",peso:7.60},
+  {id:"p12x1",label:"12x1 lb",peso:5.70}
+];
+var DIAS=["Viernes","Sabado","Domingo","Lunes","Martes","Miercoles","Jueves"];
+var LS_SEM="proyorg-sem-v1";
+var LS_HIST="proyorg-hist-v1";
+
+function nv(v){var x=parseFloat(v);return isNaN(x)?0:x;}
+function fmt(v,d){d=d===undefined?1:d;if(!isFinite(v)||isNaN(v))return "--";return v.toLocaleString("es-MX",{minimumFractionDigits:d,maximumFractionDigits:d});}
+function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function lsLoad(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+
+function initRancho(){return{tipo:"ambos",org:{rejas:"",fPri:"",fSeg:""},conv:{rejas:"",fPri:"",fSeg:""}};}
+function initPI(){return{org:{pri:{p20:"",p8x2:"",p12x1:""},seg:{p20:"",p8x2:"",p12x1:""}},conv:{pri:{p20:"",p8x2:"",p12x1:""},seg:{p20:"",p8x2:"",p12x1:""}}};}
+function initDia(){var r={};RANCHOS.forEach(function(rr){r[rr.id]=initRancho();});return{ranchos:r,pedidos:initPI(),inventario:initPI()};}
+
+function calcKg(data,tipo,cal){return PRES.reduce(function(s,p){return s+nv(data[tipo][cal][p.id])*p.peso;},0);}
+
+function TablaDoble(props){
+  var data=props.data; var onChange=props.onChange; var titulo=props.titulo;
+  return(
+    <div className="pi-outer" style={{marginBottom:10}}>
+      <div className="pi-outer-head" style={{background:"rgba(13,39,70,0.5)",color:"#90caf9"}}>{titulo}</div>
+      <div className="pi-inner-grid">
+        {["org","conv"].map(function(tipo){
+          var col=tipo==="org"?"#a8e063":"#90caf9";
+          var tot1=PRES.reduce(function(s,p){return s+nv(data[tipo].pri[p.id])*p.peso;},0);
+          var tot2=PRES.reduce(function(s,p){return s+nv(data[tipo].seg[p.id])*p.peso;},0);
+          return(
+            <div key={tipo} style={{borderRight:tipo==="org"?"1px solid rgba(66,165,245,0.1)":"none"}}>
+              <div style={{fontSize:9,fontWeight:900,letterSpacing:2,textTransform:"uppercase",padding:"5px 10px",color:col,background:tipo==="org"?"rgba(27,94,32,0.15)":"rgba(21,101,192,0.1)"}}>{tipo==="org"?"Organico":"Convencional"}</div>
+              {["pri","seg"].map(function(cal){
+                var label=cal==="pri"?"1a":"2a";
+                var tot=cal==="pri"?tot1:tot2;
+                return(
+                  <div key={cal}>
+                    <div style={{fontSize:8,fontWeight:700,color:col,opacity:0.7,padding:"3px 8px",letterSpacing:1}}>{label}</div>
+                    <table style={{marginBottom:2}}>
+                      <thead><tr><th>Pres.</th><th>Bts</th><th>Kg</th></tr></thead>
+                      <tbody>
+                        {PRES.map(function(p){
+                          var b=nv(data[tipo][cal][p.id]);
+                          return(<tr key={p.id}>
+                            <td>{p.label}</td>
+                            <td><input type="number" min="0" placeholder="0" value={data[tipo][cal][p.id]} onChange={function(e){onChange(tipo,cal,p.id,e.target.value);}} style={{borderColor:tipo==="org"?"rgba(168,224,99,0.25)":"rgba(144,202,249,0.25)"}}/></td>
+                            <td style={{color:b>0?col:"rgba(255,255,255,0.2)"}}>{b>0?fmt(b*p.peso):"--"}</td>
+                          </tr>);
+                        })}
+                        <tr className="total-row"><td style={{color:col}}>Total</td><td></td><td style={{color:col}}>{tot>0?fmt(tot):"--"}</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  var s1=useState("diario"); var view=s1[0]; var setView=s1[1];
+  var s2=useState(0); var diaIdx=s2[0]; var setDiaIdx=s2[1];
+  var s3=useState(function(){return lsLoad(LS_SEM,DIAS.map(function(){return initDia();}));});
+  var semana=s3[0]; var setSemana=s3[1];
+  var s4=useState(function(){return lsLoad(LS_HIST,[]);});
+  var hist=s4[0]; var setHist=s4[1];
+  var s5=useState(false); var confirmNueva=s5[0]; var setConfirmNueva=s5[1];
+
+  function saveSem(v){setSemana(v);lsSave(LS_SEM,v);}
+  function saveHist2(v){setHist(v);lsSave(LS_HIST,v);}
+
+  function setRancho(di,rid,tipo,field,val){
+    saveSem(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n=Object.assign({},d);n.ranchos=Object.assign({},d.ranchos);
+      n.ranchos[rid]=Object.assign({},d.ranchos[rid]);
+      n.ranchos[rid][tipo]=Object.assign({},d.ranchos[rid][tipo]);
+      n.ranchos[rid][tipo][field]=val;return n;
+    }));
+  }
+  function setRanchoTipo(di,rid,val){
+    saveSem(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n=Object.assign({},d);n.ranchos=Object.assign({},d.ranchos);
+      n.ranchos[rid]=Object.assign({},d.ranchos[rid]);
+      n.ranchos[rid].tipo=val;return n;
+    }));
+  }
+  function setPI(di,cual,tipo,cal,pid,val){
+    saveSem(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n=Object.assign({},d);n[cual]=Object.assign({},d[cual]);
+      n[cual][tipo]=Object.assign({},d[cual][tipo]);
+      n[cual][tipo][cal]=Object.assign({},d[cual][tipo][cal]);
+      n[cual][tipo][cal][pid]=val;return n;
+    }));
+  }
+
+  var dia=semana[diaIdx];
+
+  function calcDiaFn(d){
+    var org={rejas:0,kgPri:0,kgSeg:0};
+    var conv={rejas:0,kgPri:0,kgSeg:0};
+    RANCHOS.forEach(function(r){
+      var rd=d.ranchos[r.id];
+      var oR=nv(rd.org.rejas);var oP=nv(rd.org.fPri);var oS=nv(rd.org.fSeg);
+      var cR=nv(rd.conv.rejas);var cP=nv(rd.conv.fPri);var cS=nv(rd.conv.fSeg);
+      org.rejas+=oR;org.kgPri+=oR*oP*9.25;org.kgSeg+=oR*oS*9.25;
+      conv.rejas+=cR;conv.kgPri+=cR*cP*9.25;conv.kgSeg+=cR*cS*9.25;
+    });
+    var invOrgPri=calcKg(d.inventario,"org","pri");
+    var invOrgSeg=calcKg(d.inventario,"org","seg");
+    var invConvPri=calcKg(d.inventario,"conv","pri");
+    var invConvSeg=calcKg(d.inventario,"conv","seg");
+    var pedOrgPri=calcKg(d.pedidos,"org","pri");
+    var pedOrgSeg=calcKg(d.pedidos,"org","seg");
+    var pedConvPri=calcKg(d.pedidos,"conv","pri");
+    var pedConvSeg=calcKg(d.pedidos,"conv","seg");
+    return{org:org,conv:conv,invOrgPri:invOrgPri,invOrgSeg:invOrgSeg,invConvPri:invConvPri,invConvSeg:invConvSeg,pedOrgPri:pedOrgPri,pedOrgSeg:pedOrgSeg,pedConvPri:pedConvPri,pedConvSeg:pedConvSeg};
+  }
+
+  var calcDia=calcDiaFn(dia);
+
+  function calcBalance(calcD,carryOrg,carryConv){
+    // Disponible organico
+    var dispOrgPri=calcD.org.kgPri+calcD.invOrgPri+carryOrg.pri;
+    var dispOrgSeg=calcD.org.kgSeg+calcD.invOrgSeg+carryOrg.seg;
+    // Resultado organico puro
+    var resOrgPri=dispOrgPri-calcD.pedOrgPri;
+    var resOrgSeg=dispOrgSeg-calcD.pedOrgSeg;
+    // Organico que sobra (puede ir como convencional)
+    var orgSobraPri=resOrgPri>0?resOrgPri:0;
+    var orgSobraSeg=resOrgSeg>0?resOrgSeg:0;
+    // Disponible convencional (+ sobrante organico puede cubrir)
+    var dispConvPri=calcD.conv.kgPri+calcD.invConvPri+carryConv.pri;
+    var dispConvSeg=calcD.conv.kgSeg+calcD.invConvSeg+carryConv.seg;
+    var resConvPriRaw=dispConvPri-calcD.pedConvPri;
+    var resConvSegRaw=dispConvSeg-calcD.pedConvSeg;
+    // Si falta convencional, usar organico sobrante
+    var orgUsadoPri=0;var orgUsadoSeg=0;
+    var resConvPri=resConvPriRaw;var resConvSeg=resConvSegRaw;
+    if(resConvPriRaw<0&&orgSobraPri>0){
+      orgUsadoPri=Math.min(Math.abs(resConvPriRaw),orgSobraPri);
+      resConvPri=resConvPriRaw+orgUsadoPri;
+    }
+    if(resConvSegRaw<0&&orgSobraSeg>0){
+      orgUsadoSeg=Math.min(Math.abs(resConvSegRaw),orgSobraSeg);
+      resConvSeg=resConvSegRaw+orgUsadoSeg;
+    }
+    // Carry para el dia siguiente
+    var nextOrg={pri:resOrgPri-orgUsadoPri>0?resOrgPri-orgUsadoPri:0,seg:resOrgSeg-orgUsadoSeg>0?resOrgSeg-orgUsadoSeg:0};
+    var nextConv={pri:resConvPri>0?resConvPri:0,seg:resConvSeg>0?resConvSeg:0};
+    return{resOrgPri:resOrgPri,resOrgSeg:resOrgSeg,resConvPri:resConvPri,resConvSeg:resConvSeg,orgUsadoPri:orgUsadoPri,orgUsadoSeg:orgUsadoSeg,dispOrgPri:dispOrgPri,dispOrgSeg:dispOrgSeg,dispConvPri:dispConvPri,dispConvSeg:dispConvSeg,nextOrg:nextOrg,nextConv:nextConv};
+  }
+
+  // Cruce del dia actual (sin carryover para la vista diaria)
+  var cruceHoy=calcBalance(calcDia,{pri:0,seg:0},{pri:0,seg:0});
+
+  // Resumen semanal con balance corrido
+  var resumenSem=(function(){
+    var carryOrg={pri:0,seg:0};var carryConv={pri:0,seg:0};
+    return semana.map(function(d,i){
+      var cd=calcDiaFn(d);
+      var bal=calcBalance(cd,carryOrg,carryConv);
+      carryOrg=bal.nextOrg;carryConv=bal.nextConv;
+      var totPedOrgPri=cd.pedOrgPri;var totPedOrgSeg=cd.pedOrgSeg;
+      var totPedConvPri=cd.pedConvPri;var totPedConvSeg=cd.pedConvSeg;
+      var tieneDatos=cd.org.rejas>0||cd.conv.rejas>0||totPedOrgPri>0||totPedConvPri>0;
+      return{dia:DIAS[i],idx:i,cd:cd,bal:bal,tieneDatos:tieneDatos,pedOrgPri:totPedOrgPri,pedOrgSeg:totPedOrgSeg,pedConvPri:totPedConvPri,pedConvSeg:totPedConvSeg};
+    });
+  })();
+
+  var totSem={
+    orgRejas:resumenSem.reduce(function(s,d){return s+d.cd.org.rejas;},0),
+    convRejas:resumenSem.reduce(function(s,d){return s+d.cd.conv.rejas;},0),
+    orgKgPri:resumenSem.reduce(function(s,d){return s+d.cd.org.kgPri;},0),
+    orgKgSeg:resumenSem.reduce(function(s,d){return s+d.cd.org.kgSeg;},0),
+    convKgPri:resumenSem.reduce(function(s,d){return s+d.cd.conv.kgPri;},0),
+    convKgSeg:resumenSem.reduce(function(s,d){return s+d.cd.conv.kgSeg;},0),
+    pedOrgPri:resumenSem.reduce(function(s,d){return s+d.pedOrgPri;},0),
+    pedOrgSeg:resumenSem.reduce(function(s,d){return s+d.pedOrgSeg;},0),
+    pedConvPri:resumenSem.reduce(function(s,d){return s+d.pedConvPri;},0),
+    pedConvSeg:resumenSem.reduce(function(s,d){return s+d.pedConvSeg;},0)
+  };
+
+  function nuevaSemana(){
+    var fecha=new Date().toLocaleDateString("es-MX",{day:"2-digit",month:"short",year:"numeric"});
+    var snap={fecha:fecha,ts:Date.now(),totSem:totSem};
+    saveHist2([snap].concat(hist).slice(0,52));
+    saveSem(DIAS.map(function(){return initDia();}));
+    setDiaIdx(0);setView("diario");setConfirmNueva(false);
+  }
+
+  var INP_ORG={borderColor:"rgba(168,224,99,0.3)"};
+  var INP_CONV={borderColor:"rgba(144,202,249,0.2)"};
+
+  return(
+    <div>
+      <div className="hdr">
+        <div className="hdr-top">
+          <div className="hdr-icon">O</div>
+          <div>
+            <div className="hdr-title">PROYECCION ORGANICO / CONVENCIONAL</div>
+            <div className="hdr-sub">Parras Valley - Seguimiento Semanal</div>
+          </div>
+        </div>
+        <div className="view-tabs">
+          <button className={"view-tab "+(view==="diario"?"active":"")} onClick={function(){setView("diario");}}>Diario</button>
+          <button className={"view-tab "+(view==="semanal"?"active":"")} onClick={function(){setView("semanal");}}>Semanal</button>
+          <button className={"view-tab "+(view==="historial"?"active":"")} onClick={function(){setView("historial");}}>Historial</button>
+        </div>
+      </div>
+
+      <div className="wrap">
+
+        {/* DIARIO */}
+        {view==="diario"&&(
+          <div>
+            <div className="dias-tabs">
+              {DIAS.map(function(d,i){return(<button key={d} className={"dia-btn "+(diaIdx===i?"active":"")} onClick={function(){setDiaIdx(i);}}>{d}</button>);})}
+            </div>
+
+            {/* Regla importante */}
+            <div style={{background:"rgba(255,165,0,0.08)",border:"1.5px solid rgba(255,165,0,0.35)",borderRadius:10,padding:"8px 14px",marginBottom:16,fontSize:11,color:"#ffb74d",fontWeight:600}}>
+              Organico puede ir como convencional. Convencional NO puede ir como organico.
+            </div>
+
+            <div className="sec">Ranchos - {DIAS[diaIdx]}</div>
+            {RANCHOS.map(function(r){
+              var rd=dia.ranchos[r.id];
+              var orgRejas=nv(rd.org.rejas);var convRejas=nv(rd.conv.rejas);
+              var orgPri=orgRejas*nv(rd.org.fPri)*9.25;var orgSeg=orgRejas*nv(rd.org.fSeg)*9.25;
+              var convPri=convRejas*nv(rd.conv.fPri)*9.25;var convSeg=convRejas*nv(rd.conv.fSeg)*9.25;
+              var hasData=orgRejas>0||convRejas>0;
+              return(
+                <div className="rancho-card" key={r.id} style={{marginBottom:10}}>
+                  <div className="rancho-head">{r.nombre}</div>
+                  <div className="rancho-body">
+                    {["org","conv"].map(function(tipo){
+                      var col=tipo==="org"?"#a8e063":"#90caf9";
+                      var rd2=rd[tipo];
+                      return(
+                        <div key={tipo}>
+                          <div className={"tipo-label "+tipo}>{tipo==="org"?"Organico":"Convencional"}</div>
+                          <div className="f" style={{marginBottom:6}}><label>Rejas</label><input type="number" min="0" placeholder="0" className={tipo} value={rd2.rejas} onChange={function(e){setRancho(diaIdx,r.id,tipo,"rejas",e.target.value);}}/></div>
+                          <div className="f" style={{marginBottom:6}}><label>Factor 1a</label><input type="number" min="0" step="0.001" placeholder="0.000" className={tipo} value={rd2.fPri} onChange={function(e){setRancho(diaIdx,r.id,tipo,"fPri",e.target.value);}}/></div>
+                          <div className="f"><label>Factor 2a</label><input type="number" min="0" step="0.001" placeholder="0.000" className={tipo} value={rd2.fSeg} onChange={function(e){setRancho(diaIdx,r.id,tipo,"fSeg",e.target.value);}}/></div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {hasData&&(
+                    <div className="rancho-result">
+                      {[["Rj Org",orgRejas,"#9e9e9e",0],["1a Org",orgPri,"#a8e063",1],["1a Conv",convPri,"#90caf9",1],["2a Org",orgSeg,"#cddc39",1]].map(function(x){
+                        return(<div className="rr" key={x[0]}><div className="rr-label" style={{color:x[2]}}>{x[0]}</div><div className="rr-val" style={{color:x[2]}}>{x[1]>0?fmt(x[1],x[3]):"--"}</div></div>);
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="sec">Total proyectado</div>
+            <div className="tot-grid">
+              <div className="tot-card rejas"><div className="tot-label">Rejas Org</div><div className="tot-val">{fmt(calcDia.org.rejas,0)}</div></div>
+              <div className="tot-card conv"><div className="tot-label">Rejas Conv</div><div className="tot-val">{fmt(calcDia.conv.rejas,0)}</div></div>
+              <div className="tot-card org1"><div className="tot-label">Kg 1a Org</div><div className="tot-val">{fmt(calcDia.org.kgPri)}</div><div className="tot-sub">{fmt(calcDia.org.kgSeg)} kg 2a</div></div>
+              <div className="tot-card conv"><div className="tot-label">Kg 1a Conv</div><div className="tot-val">{fmt(calcDia.conv.kgPri)}</div><div className="tot-sub">{fmt(calcDia.conv.kgSeg)} kg 2a</div></div>
+            </div>
+
+            <div className="sec">Pedidos del dia</div>
+            <TablaDoble data={dia.pedidos} titulo="Pedidos" onChange={function(t,c,p,v){setPI(diaIdx,"pedidos",t,c,p,v);}}/>
+
+            <div className="sec">Inventario disponible</div>
+            <TablaDoble data={dia.inventario} titulo="Inventario" onChange={function(t,c,p,v){setPI(diaIdx,"inventario",t,c,p,v);}}/>
+
+            <div className="sec">Cruce del dia</div>
+            {[["pri","Primera 1a"],["seg","Segunda 2a"]].map(function(x){
+              var cal=x[0];var lbl=x[1];
+              var resOrgKey="resOrg"+cal.charAt(0).toUpperCase()+cal.slice(1);
+              var resConvKey="resConv"+cal.charAt(0).toUpperCase()+cal.slice(1);
+              var orgVal=cruceHoy[resOrgKey];var convVal=cruceHoy[resConvKey];
+              var orgOk=orgVal>=0;var convOk=convVal>=0;
+              var orgUsado=cal==="pri"?cruceHoy.orgUsadoPri:cruceHoy.orgUsadoSeg;
+              return(
+                <div className="cruce-outer" key={cal} style={{marginBottom:10}}>
+                  <div className="cruce-outer-head"><span>{lbl}</span></div>
+                  <div className="cruce-inner">
+                    <div className={"cruce-cell org "+(orgOk?"":"")}>
+                      <div className="cruce-label">Organico</div>
+                      <div className="cruce-val" style={{color:orgOk?"#a8e063":"#ef5350"}}>{fmt(cal==="pri"?cruceHoy.dispOrgPri:cruceHoy.dispOrgSeg)} kg</div>
+                      <div className="cruce-sub">Pedido: {fmt(cal==="pri"?calcDia.pedOrgPri:calcDia.pedOrgSeg)} kg</div>
+                      <div className="cruce-diff" style={{color:orgOk?"#a8e063":"#ef5350"}}>{orgOk?"\u25B2":"\u25BC"} {fmt(Math.abs(orgVal))} kg {orgOk?"sobra":"falta"}</div>
+                    </div>
+                    <div className="cruce-cell conv">
+                      <div className="cruce-label">Convencional</div>
+                      <div className="cruce-val" style={{color:convOk?"#90caf9":"#ef5350"}}>{fmt(cal==="pri"?cruceHoy.dispConvPri:cruceHoy.dispConvSeg)} kg</div>
+                      <div className="cruce-sub">Pedido: {fmt(cal==="pri"?calcDia.pedConvPri:calcDia.pedConvSeg)} kg</div>
+                      {orgUsado>0&&<div className="cruce-sub" style={{color:"#ffb74d"}}>+{fmt(orgUsado)} kg org usada como conv</div>}
+                      <div className="cruce-diff" style={{color:convOk?"#90caf9":"#ef5350"}}>{convOk?"\u25B2":"\u25BC"} {fmt(Math.abs(convVal))} kg {convOk?"sobra":"falta"}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {(cruceHoy.orgUsadoPri>0||cruceHoy.orgUsadoSeg>0)&&(
+              <div className="alerta-org-conv">
+                Organico usado como convencional: 1a {fmt(cruceHoy.orgUsadoPri)} kg . 2a {fmt(cruceHoy.orgUsadoSeg)} kg
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SEMANAL */}
+        {view==="semanal"&&(
+          <div>
+            <div className="sec">Balance semanal - Viernes a Jueves</div>
+            <div style={{overflowX:"auto",marginBottom:14}}>
+              <table className="sem-table" style={{minWidth:660}}>
+                <thead>
+                  <tr>
+                    <th style={{textAlign:"left"}}>Dia</th>
+                    <th className="org">Kg1a Org</th>
+                    <th className="org">Bal1a Org</th>
+                    <th className="conv">Kg1a Conv</th>
+                    <th className="conv">Bal1a Conv</th>
+                    <th className="org">Kg2a Org</th>
+                    <th className="org">Bal2a Org</th>
+                    <th className="conv">Bal2a Conv</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {resumenSem.map(function(d){
+                    var b=d.bal;
+                    var okO1=b.resOrgPri>=0;var okC1=b.resConvPri>=0;
+                    var okO2=b.resOrgSeg>=0;var okC2=b.resConvSeg>=0;
+                    return(
+                      <tr key={d.dia} className={diaIdx===d.idx?"dia-activo":""} onClick={function(){setDiaIdx(d.idx);setView("diario");}}>
+                        <td>{d.dia}</td>
+                        <td style={{color:"#a8e063"}}>{d.cd.org.kgPri>0?fmt(d.cd.org.kgPri):"--"}</td>
+                        <td style={{color:okO1?"#a8e063":"#ef5350",fontWeight:900}}>{d.tieneDatos?(okO1?"\u25B2":"\u25BC")+" "+fmt(Math.abs(b.resOrgPri),0):"--"}</td>
+                        <td style={{color:"#90caf9"}}>{d.cd.conv.kgPri>0?fmt(d.cd.conv.kgPri):"--"}</td>
+                        <td style={{color:okC1?"#90caf9":"#ef5350",fontWeight:900}}>{d.tieneDatos?(okC1?"\u25B2":"\u25BC")+" "+fmt(Math.abs(b.resConvPri),0):"--"}</td>
+                        <td style={{color:"#cddc39"}}>{d.cd.org.kgSeg>0?fmt(d.cd.org.kgSeg):"--"}</td>
+                        <td style={{color:okO2?"#cddc39":"#ef5350",fontWeight:900}}>{d.tieneDatos?(okO2?"\u25B2":"\u25BC")+" "+fmt(Math.abs(b.resOrgSeg),0):"--"}</td>
+                        <td style={{color:okC2?"#90caf9":"#ef5350",fontWeight:900}}>{d.tieneDatos?(okC2?"\u25B2":"\u25BC")+" "+fmt(Math.abs(b.resConvSeg),0):"--"}</td>
+                      </tr>
+                    );
+                  })}
+                  <tr className="total-sem">
+                    <td>TOTAL</td>
+                    <td>{fmt(totSem.orgKgPri)}</td><td></td>
+                    <td>{fmt(totSem.convKgPri)}</td><td></td>
+                    <td>{fmt(totSem.orgKgSeg)}</td><td></td><td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="hint">^ Sobra . v Falta . Sobrante organico cubre faltante convencional. Toca un dia para editarlo.</div>
+
+            {/* Tarjetas de balance dia a dia */}
+            <div className="sec">Balance por dia</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(110px,1fr))",gap:8,marginBottom:16}}>
+              {resumenSem.filter(function(d){return d.tieneDatos;}).map(function(d){
+                var b=d.bal;
+                var okAll=b.resOrgPri>=0&&b.resConvPri>=0&&b.resOrgSeg>=0&&b.resConvSeg>=0;
+                var failAll=b.resOrgPri<0&&b.resConvPri<0;
+                return(
+                  <div key={d.dia} style={{background:okAll?"rgba(27,94,32,0.25)":failAll?"rgba(183,28,28,0.2)":"rgba(102,77,0,0.2)",border:"2px solid "+(okAll?"rgba(168,224,99,0.4)":failAll?"rgba(239,83,80,0.4)":"rgba(255,165,0,0.4)"),borderRadius:12,padding:"10px 8px",cursor:"pointer",textAlign:"center"}} onClick={function(){setDiaIdx(d.idx);setView("diario");}}>
+                    <div style={{fontSize:9,fontWeight:900,color:"#b0bec5",letterSpacing:1,marginBottom:6}}>{d.dia.toUpperCase()}</div>
+                    <div style={{fontSize:9,color:"#a8e063",fontWeight:700,marginBottom:2}}>ORG</div>
+                    <div style={{fontSize:11,fontWeight:900,color:b.resOrgPri>=0?"#a8e063":"#ef5350"}}>{b.resOrgPri>=0?"\u25B2":"\u25BC"}{fmt(Math.abs(b.resOrgPri),0)}</div>
+                    <div style={{fontSize:9,color:"#90caf9",fontWeight:700,marginBottom:2,marginTop:4}}>CONV</div>
+                    <div style={{fontSize:11,fontWeight:900,color:b.resConvPri>=0?"#90caf9":"#ef5350"}}>{b.resConvPri>=0?"\u25B2":"\u25BC"}{fmt(Math.abs(b.resConvPri),0)}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Cierre semanal */}
+            <div className="sec">Cierre de semana</div>
+            <div className="cierre-card">
+              <div style={{fontSize:10,fontWeight:900,color:"#90caf9",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Balance Total Semanal</div>
+              <div className="cierre-grid">
+                {[
+                  {label:"Organico 1a",emp:totSem.orgKgPri,ped:totSem.pedOrgPri,col:"#a8e063"},
+                  {label:"Conv 1a",emp:totSem.convKgPri,ped:totSem.pedConvPri,col:"#90caf9"},
+                  {label:"Organico 2a",emp:totSem.orgKgSeg,ped:totSem.pedOrgSeg,col:"#cddc39"},
+                  {label:"Conv 2a",emp:totSem.convKgSeg,ped:totSem.pedConvSeg,col:"#64b5f6"}
+                ].map(function(x){
+                  var dif=x.emp-x.ped;var ok=dif>=0;
+                  return(
+                    <div className="cierre-item" key={x.label}>
+                      <div style={{fontSize:9,fontWeight:900,color:x.col,letterSpacing:1.5,textTransform:"uppercase",marginBottom:8}}>{x.label}</div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:10,color:"rgba(255,255,255,0.4)"}}>Empacado</span><span style={{fontSize:13,fontWeight:800,color:x.col}}>{fmt(x.emp)} kg</span></div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}><span style={{fontSize:10,color:"rgba(255,255,255,0.4)"}}>Pedidos</span><span style={{fontSize:13,fontWeight:800,color:"rgba(255,255,255,0.6)"}}>{fmt(x.ped)} kg</span></div>
+                      <div style={{borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:7,display:"flex",justifyContent:"space-between"}}>
+                        <span style={{fontSize:9,fontWeight:900,color:ok?"#69f0ae":"#ef5350"}}>{ok?"SOBRARON":"FALTARON"}</span>
+                        <span style={{fontSize:16,fontWeight:900,color:ok?"#69f0ae":"#ef5350"}}>{ok?"\u25B2":"\u25BC"} {fmt(Math.abs(dif))} kg</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:4}}>
+                <div style={{background:"rgba(0,0,0,0.25)",borderRadius:8,padding:"10px",textAlign:"center"}}><div style={{fontSize:9,color:"#a8e063",fontWeight:800,marginBottom:4}}>REJAS ORGANICO</div><div style={{fontSize:22,fontWeight:900,color:"#a8e063"}}>{fmt(totSem.orgRejas,0)}</div></div>
+                <div style={{background:"rgba(0,0,0,0.25)",borderRadius:8,padding:"10px",textAlign:"center"}}><div style={{fontSize:9,color:"#90caf9",fontWeight:800,marginBottom:4}}>REJAS CONV</div><div style={{fontSize:22,fontWeight:900,color:"#90caf9"}}>{fmt(totSem.convRejas,0)}</div></div>
+              </div>
+            </div>
+
+            <div className="hint">Toca cualquier dia para ir a su captura</div>
+            {!confirmNueva
+              ?<button className="btn-nueva" onClick={function(){setConfirmNueva(true);}}>Cerrar semana y guardar en historial</button>
+              :<div className="confirm-box">
+                <div style={{fontSize:13,fontWeight:700,color:"#ef9a9a"}}>Confirmar cierre - se guardara y limpiaran los datos</div>
+                <div className="confirm-btns">
+                  <button className="btn-cancel" onClick={function(){setConfirmNueva(false);}}>Cancelar</button>
+                  <button className="btn-confirm" onClick={nuevaSemana}>Confirmar</button>
+                </div>
+              </div>
+            }
+          </div>
+        )}
+
+        {/* HISTORIAL */}
+        {view==="historial"&&(
+          <div>
+            <div className="sec">Historial de semanas</div>
+            {!hist.length
+              ?<div className="empty">Sin semanas cerradas aun</div>
+              :hist.map(function(h,i){return(
+                <div className="hist-card" key={h.ts||i}>
+                  <div>
+                    <div style={{fontSize:16,fontWeight:900,color:"#90caf9"}}>{h.fecha}</div>
+                    <div style={{fontSize:10,color:"#546e7a",marginTop:3}}>Org: {fmt(h.totSem.orgKgPri)} kg 1a . Conv: {fmt(h.totSem.convKgPri)} kg 1a</div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontSize:20,fontWeight:900,color:"#a8e063"}}>{fmt(h.totSem.orgRejas+h.totSem.convRejas,0)} rejas</div>
+                  </div>
+                </div>
+              );})}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
