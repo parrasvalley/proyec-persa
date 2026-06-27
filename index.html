@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Proyeccion Persa Semanal - Parras Valley</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0d1f0f;color:#e8f5e2;font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh;}
+
+    /* HEADER */
+    .hdr{background:linear-gradient(135deg,#0a3d12 0%,#1a5c1e 50%,#0d2e10 100%);border-bottom:3px solid #4caf50;padding:16px 20px 0;}
+    .hdr-top{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+    .pepino-icon{font-size:48px;line-height:1;filter:drop-shadow(0 3px 8px rgba(76,175,80,0.5));}
+    .hdr-title{font-size:clamp(20px,5vw,32px);font-weight:900;color:#a8e063;letter-spacing:1px;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.5);}
+    .hdr-sub{font-size:11px;color:#66bb6a;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+    .view-tabs{display:flex;gap:0;border-radius:0;}
+    .view-tab{flex:1;padding:10px 8px;border:none;background:rgba(0,0,0,0.25);font-family:system-ui;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:#81c784;transition:all 0.2s;border-top:2px solid transparent;}
+    .view-tab.active{background:rgba(168,224,99,0.15);color:#a8e063;border-top:3px solid #a8e063;}
+    .view-tab:hover:not(.active){background:rgba(255,255,255,0.08);color:#c8e6c9;}
+
+    /* MAIN */
+    .wrap{max-width:960px;margin:0 auto;padding:20px 16px 60px;}
+
+    /* DIAS */
+    .dias-tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;}
+    .dia-btn{flex-shrink:0;padding:8px 14px;border:2px solid rgba(76,175,80,0.3);border-radius:20px;background:transparent;font-family:system-ui;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;color:#81c784;transition:all 0.2s;}
+    .dia-btn.active{background:linear-gradient(135deg,#2e7d32,#4caf50);border-color:#4caf50;color:#fff;box-shadow:0 4px 14px rgba(76,175,80,0.4);}
+    .dia-btn:hover:not(.active){border-color:#4caf50;color:#a8e063;}
+
+    /* SECCION */
+    .sec{font-size:10px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#66bb6a;margin:20px 0 10px;display:flex;align-items:center;gap:10px;}
+    .sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(76,175,80,0.5),transparent);}
+
+    /* RANCHO CARD */
+    .ranchos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;}
+    .rancho-card{background:linear-gradient(135deg,rgba(27,67,30,0.8),rgba(13,31,15,0.9));border:2px solid rgba(76,175,80,0.25);border-radius:14px;overflow:hidden;transition:border-color 0.2s;}
+    .rancho-card:hover{border-color:rgba(76,175,80,0.6);}
+    .rancho-head{background:linear-gradient(135deg,#1b5e20,#2e7d32);padding:10px 16px;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#c8e6c9;}
+    .rancho-body{padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .f label{display:block;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#81c784;margin-bottom:5px;}
+    .f input{width:100%;border:2px solid rgba(76,175,80,0.3);border-radius:8px;padding:8px 10px;font-family:system-ui;font-size:16px;font-weight:800;background:rgba(0,0,0,0.35);color:#e8f5e2;outline:none;transition:border-color 0.2s;}
+    .f input:focus{border-color:#4caf50;background:rgba(76,175,80,0.08);}
+    .f input::placeholder{color:rgba(129,199,132,0.3);font-weight:400;}
+    .rancho-result{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid rgba(76,175,80,0.2);}
+    .rr{padding:10px 8px;text-align:center;border-right:1px solid rgba(76,175,80,0.15);}
+    .rr:last-child{border-right:none;}
+    .rr-label{font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#66bb6a;margin-bottom:3px;}
+    .rr-val{font-size:18px;font-weight:900;color:#e8f5e2;}
+    .rr-val.pri{color:#69f0ae;}
+    .rr-val.seg{color:#ffcc02;}
+
+    /* TOTALES */
+    .total-ranchos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .tr-card{border-radius:14px;padding:16px;border:2px solid;text-align:center;}
+    .tr-card.rejas{background:rgba(13,71,161,0.2);border-color:rgba(33,150,243,0.4);}
+    .tr-card.pri{background:rgba(27,94,32,0.3);border-color:rgba(105,240,174,0.4);}
+    .tr-card.seg{background:rgba(102,77,0,0.3);border-color:rgba(255,204,2,0.4);}
+    .tr-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+    .tr-card.rejas .tr-label{color:#64b5f6;}
+    .tr-card.pri .tr-label{color:#69f0ae;}
+    .tr-card.seg .tr-label{color:#ffcc02;}
+    .tr-val{font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1;}
+    .tr-card.rejas .tr-val{color:#90caf9;}
+    .tr-card.pri .tr-val{color:#69f0ae;}
+    .tr-card.seg .tr-val{color:#ffcc02;}
+    .tr-sub{font-size:10px;margin-top:4px;opacity:0.7;}
+
+    /* PI GRID */
+    .pi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
+    .pi-card{border:2px solid;border-radius:14px;overflow:hidden;}
+    .pi-card.pri{border-color:rgba(105,240,174,0.35);background:rgba(27,94,32,0.15);}
+    .pi-card.seg{border-color:rgba(255,204,2,0.35);background:rgba(102,77,0,0.15);}
+    .pi-head{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid;}
+    .pi-card.pri .pi-head{color:#69f0ae;border-color:rgba(105,240,174,0.2);background:rgba(27,94,32,0.3);}
+    .pi-card.seg .pi-head{color:#ffcc02;border-color:rgba(255,204,2,0.2);background:rgba(102,77,0,0.3);}
+    table{width:100%;border-collapse:collapse;table-layout:fixed;}
+    th{font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#66bb6a;padding:5px 8px;text-align:right;border-bottom:1px solid rgba(76,175,80,0.15);}
+    th:first-child{text-align:left;width:38%;}
+    td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.05);text-align:right;font-size:13px;}
+    td:first-child{text-align:left;}
+    tr:last-child td{border-bottom:none;}
+    .pn{font-size:12px;font-weight:700;color:#c8e6c9;}
+    td input{width:100%;border:1.5px solid rgba(76,175,80,0.25);border-radius:6px;padding:4px 6px;font-family:system-ui;font-size:14px;font-weight:800;text-align:right;background:rgba(0,0,0,0.3);color:#e8f5e2;outline:none;}
+    td input:focus{border-color:#4caf50;}
+    .total-row td{font-weight:900;font-size:13px;background:rgba(76,175,80,0.08);border-top:1.5px solid rgba(76,175,80,0.2)!important;color:#e8f5e2;}
+    .pi-card.pri .total-row td:last-child{color:#69f0ae;}
+    .pi-card.seg .total-row td:last-child{color:#ffcc02;}
+
+    /* CRUCE */
+    .cruce-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .cruce-card{border-radius:14px;padding:16px;border:2px solid;}
+    .cruce-card.ok{background:rgba(27,94,32,0.25);border-color:rgba(105,240,174,0.5);}
+    .cruce-card.warn{background:rgba(183,28,28,0.2);border-color:rgba(239,83,80,0.5);}
+    .cruce-card.neutral{background:rgba(33,33,33,0.3);border-color:rgba(120,120,120,0.3);}
+    .cruce-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+    .cruce-card.ok .cruce-label{color:#69f0ae;}
+    .cruce-card.warn .cruce-label{color:#ef9a9a;}
+    .cruce-card.neutral .cruce-label{color:#9e9e9e;}
+    .cruce-val{font-size:clamp(18px,3vw,26px);font-weight:900;margin-bottom:6px;}
+    .cruce-card.ok .cruce-val{color:#69f0ae;}
+    .cruce-card.warn .cruce-val{color:#ef5350;}
+    .cruce-card.neutral .cruce-val{color:#bdbdbd;}
+    .cruce-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;}
+    .cruce-diff{font-size:14px;font-weight:900;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);}
+
+    /* SEMANAL */
+    .sem-table{width:100%;border-collapse:collapse;font-size:14px;}
+    .sem-table th{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#66bb6a;padding:8px 10px;border-bottom:2px solid rgba(76,175,80,0.4);text-align:right;}
+    .sem-table th:first-child{text-align:left;}
+    .sem-table td{padding:10px 10px;border-bottom:1px solid rgba(76,175,80,0.1);text-align:right;cursor:pointer;transition:background 0.15s;}
+    .sem-table td:first-child{text-align:left;font-weight:800;color:#c8e6c9;}
+    .sem-table tr:hover td{background:rgba(76,175,80,0.08);}
+    .sem-table tr.dia-activo td{background:rgba(76,175,80,0.12);}
+    .sem-table .total-sem td{font-weight:900;font-size:15px;background:linear-gradient(135deg,rgba(27,94,32,0.5),rgba(13,45,13,0.8));color:#a8e063;border-bottom:none;border-top:2px solid rgba(76,175,80,0.4);}
+    .sem-table .total-sem td:first-child{color:#a8e063;}
+    .hint{font-size:10px;color:#66bb6a;margin-top:8px;letter-spacing:1px;opacity:0.7;}
+
+    /* BTN NUEVA */
+    .btn-nueva{width:100%;padding:14px;margin-top:18px;border:2px solid rgba(33,150,243,0.4);border-radius:12px;background:rgba(13,71,161,0.2);color:#64b5f6;font-family:system-ui;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+    .btn-nueva:hover{background:rgba(33,150,243,0.2);border-color:rgba(33,150,243,0.7);}
+    .confirm-box{margin-top:16px;padding:14px;background:rgba(183,28,28,0.15);border:2px solid rgba(239,83,80,0.4);border-radius:12px;}
+    .confirm-msg{font-size:13px;font-weight:700;color:#ef9a9a;margin-bottom:12px;}
+    .confirm-btns{display:flex;gap:10px;}
+    .btn-cancel{flex:1;padding:10px;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.05);font-family:system-ui;font-size:12px;font-weight:700;cursor:pointer;color:#9e9e9e;}
+    .btn-confirm{flex:1;padding:10px;border:none;border-radius:8px;background:linear-gradient(135deg,#b71c1c,#ef5350);font-family:system-ui;font-size:12px;font-weight:800;cursor:pointer;color:#fff;}
+
+    /* HISTORIAL */
+    .hist-card{background:rgba(27,67,30,0.25);border:2px solid rgba(76,175,80,0.2);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+    .hist-fecha{font-size:16px;font-weight:900;color:#a8e063;}
+    .hist-nums{font-size:11px;color:#81c784;margin-top:3px;}
+    .hist-bts{font-size:24px;font-weight:900;color:#69f0ae;}
+
+    .empty{text-align:center;padding:50px 20px;color:#4caf50;font-size:14px;opacity:0.6;}
+
+    @media(max-width:600px){
+      .ranchos{grid-template-columns:1fr;}
+      .total-ranchos{grid-template-columns:1fr 1fr 1fr;}
+      .pi-grid{grid-template-columns:1fr;}
+      .cruce-grid{grid-template-columns:1fr;}
+      .tr-val{font-size:22px;}
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+var useState=React.useState;
+
+var RANCHOS=[
+  {id:"f4h",nombre:"Forrajera 4 Hermanos"},
+  {id:"pvt",nombre:"Parras Valley Tomatoes"},
+  {id:"crp",nombre:"Cordillera Real de Parras"}
+];
+var PRES=[
+  {id:"p20",label:"20 lb",peso:9.25},
+  {id:"p8x2",label:"8x2 lb",peso:7.60},
+  {id:"p12x1",label:"12x1 lb",peso:5.70}
+];
+var DIAS=["Viernes","Sabado","Domingo","Lunes","Martes","Miercoles","Jueves"];
+var LS_SEM="proypersa-sem-v1";
+var LS_HIST="proypersa-hist-v1";
+
+function nv(v){var x=parseFloat(v);return isNaN(x)?0:x;}
+function fmt(v,d){d=d===undefined?1:d;if(!isFinite(v)||isNaN(v))return "--";return v.toLocaleString("es-MX",{minimumFractionDigits:d,maximumFractionDigits:d});}
+function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function lsLoad(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+
+function initRancho(){return{rejas:"",factor_pri:"",factor_seg:""};}
+function initPedidos(){return{pri:{p20:"",p8x2:"",p12x1:""},seg:{p20:"",p8x2:"",p12x1:""}};}
+function initInv(){return{pri:{p20:"",p8x2:"",p12x1:""},seg:{p20:"",p8x2:"",p12x1:""}};}
+function initDia(){var r={};RANCHOS.forEach(function(rr){r[rr.id]=initRancho();});return{ranchos:r,pedidos:initPedidos(),inventario:initInv()};}
+
+function TablaPI(props){
+  var cat=props.cat; var cls=props.cls; var data=props.data; var onChange=props.onChange; var titulo=props.titulo;
+  var totalKg=PRES.reduce(function(s,p){return s+nv(data[cat][p.id])*p.peso;},0);
+  var totalBts=PRES.reduce(function(s,p){return s+nv(data[cat][p.id]);},0);
+  return(
+    <div className={"pi-card "+cls}>
+      <div className="pi-head">{titulo}  -  {cls==="pri"?"Primera":"Segunda"}</div>
+      <table>
+        <thead><tr><th>Pres.</th><th>Bultos</th><th>Kg</th></tr></thead>
+        <tbody>
+          {PRES.map(function(p){
+            var b=nv(data[cat][p.id]);
+            return(<tr key={p.id}>
+              <td><div className="pn">{p.label}</div></td>
+              <td><input type="number" min="0" placeholder="0" value={data[cat][p.id]} onChange={function(e){onChange(cat,p.id,e.target.value);}}/></td>
+              <td style={{color:b>0?(cls==="pri"?"#69f0ae":"#ffcc02"):"rgba(255,255,255,0.25)"}}>{b>0?fmt(b*p.peso):"--"}</td>
+            </tr>);
+          })}
+          <tr className="total-row"><td>TOTAL</td><td>{totalBts||"--"}</td><td>{totalKg>0?fmt(totalKg):"--"}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function App(){
+  var s1=useState("diario"); var view=s1[0]; var setView=s1[1];
+  var s2=useState(0); var diaIdx=s2[0]; var setDiaIdx=s2[1];
+  var s3=useState(function(){return lsLoad(LS_SEM,DIAS.map(function(){return initDia();}));});
+  var semana=s3[0]; var setSemana=s3[1];
+  var s4=useState(function(){return lsLoad(LS_HIST,[]);});
+  var historial=s4[0]; var setHistorial=s4[1];
+  var s5=useState(false); var confirmNueva=s5[0]; var setConfirmNueva=s5[1];
+
+  function saveSemana(v){setSemana(v);lsSave(LS_SEM,v);}
+  function saveHist(v){setHistorial(v);lsSave(LS_HIST,v);}
+
+  function setRanchoField(di,rid,field,val){
+    saveSemana(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n2=Object.assign({},d);n2.ranchos=Object.assign({},d.ranchos);
+      n2.ranchos[rid]=Object.assign({},d.ranchos[rid]);n2.ranchos[rid][field]=val;return n2;
+    }));
+  }
+  function setPedido(di,cat,pid,val){
+    saveSemana(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n2=Object.assign({},d);n2.pedidos=Object.assign({},d.pedidos);
+      n2.pedidos[cat]=Object.assign({},d.pedidos[cat]);n2.pedidos[cat][pid]=val;return n2;
+    }));
+  }
+  function setInv(di,cat,pid,val){
+    saveSemana(semana.map(function(d,i){
+      if(i!==di)return d;
+      var n2=Object.assign({},d);n2.inventario=Object.assign({},d.inventario);
+      n2.inventario[cat]=Object.assign({},d.inventario[cat]);n2.inventario[cat][pid]=val;return n2;
+    }));
+  }
+
+  var dia=semana[diaIdx];
+
+  var calcDia=(function(){
+    var res=RANCHOS.map(function(r){
+      var rd=dia.ranchos[r.id];
+      var rejas=nv(rd.rejas);var fPri=nv(rd.factor_pri);var fSeg=nv(rd.factor_seg);
+      var bPri=rejas*fPri;var bSeg=rejas*fSeg;
+      return{id:r.id,nombre:r.nombre,rejas:rejas,bultos_pri:bPri,bultos_seg:bSeg,kg_pri:bPri*9.25,kg_seg:bSeg*9.25};
+    });
+    return{
+      res:res,
+      tot_rejas:res.reduce(function(s,r){return s+r.rejas;},0),
+      tot_bPri:res.reduce(function(s,r){return s+r.bultos_pri;},0),
+      tot_bSeg:res.reduce(function(s,r){return s+r.bultos_seg;},0),
+      tot_kgPri:res.reduce(function(s,r){return s+r.kg_pri;},0),
+      tot_kgSeg:res.reduce(function(s,r){return s+r.kg_seg;},0)
+    };
+  })();
+
+  var kgPedidos={
+    pri:PRES.reduce(function(s,p){return s+nv(dia.pedidos.pri[p.id])*p.peso;},0),
+    seg:PRES.reduce(function(s,p){return s+nv(dia.pedidos.seg[p.id])*p.peso;},0)
+  };
+  var kgInv={
+    pri:PRES.reduce(function(s,p){return s+nv(dia.inventario.pri[p.id])*p.peso;},0),
+    seg:PRES.reduce(function(s,p){return s+nv(dia.inventario.seg[p.id])*p.peso;},0)
+  };
+  var cruce={
+    dispPri:calcDia.tot_kgPri+kgInv.pri,dispSeg:calcDia.tot_kgSeg+kgInv.seg,
+    diffPri:(calcDia.tot_kgPri+kgInv.pri)-kgPedidos.pri,
+    diffSeg:(calcDia.tot_kgSeg+kgInv.seg)-kgPedidos.seg
+  };
+
+  var resumenSem=semana.map(function(d,i){
+    var ranchos=RANCHOS.map(function(r){
+      var rd=d.ranchos[r.id];var rejas=nv(rd.rejas);
+      var bPri=rejas*nv(rd.factor_pri);var bSeg=rejas*nv(rd.factor_seg);
+      return{rejas:rejas,bPri:bPri,bSeg:bSeg,kgPri:bPri*9.25,kgSeg:bSeg*9.25};
+    });
+    return{
+      dia:DIAS[i],idx:i,
+      rejas:ranchos.reduce(function(s,r){return s+r.rejas;},0),
+      bPri:ranchos.reduce(function(s,r){return s+r.bPri;},0),
+      bSeg:ranchos.reduce(function(s,r){return s+r.bSeg;},0),
+      kgPri:ranchos.reduce(function(s,r){return s+r.kgPri;},0),
+      kgSeg:ranchos.reduce(function(s,r){return s+r.kgSeg;},0)
+    };
+  });
+
+  var totSem={
+    rejas:resumenSem.reduce(function(s,d){return s+d.rejas;},0),
+    bPri:resumenSem.reduce(function(s,d){return s+d.bPri;},0),
+    bSeg:resumenSem.reduce(function(s,d){return s+d.bSeg;},0),
+    kgPri:resumenSem.reduce(function(s,d){return s+d.kgPri;},0),
+    kgSeg:resumenSem.reduce(function(s,d){return s+d.kgSeg;},0)
+  };
+
+  function nuevaSemana(){
+    var fecha=new Date().toLocaleDateString("es-MX",{day:"2-digit",month:"short",year:"numeric"});
+    var snap={fecha:fecha,ts:Date.now(),totRejas:totSem.rejas,totBPri:totSem.bPri,totKgPri:totSem.kgPri,totBSeg:totSem.bSeg,totKgSeg:totSem.kgSeg};
+    saveHist([snap].concat(historial).slice(0,52));
+    saveSemana(DIAS.map(function(){return initDia();}));
+    setDiaIdx(0);setView("diario");setConfirmNueva(false);
+  }
+
+  return(
+    <div>
+      <div className="hdr">
+        <div className="hdr-top">
+          <div className="pepino-icon">O</div>
+          <div>
+            <div className="hdr-title">PROYECCION PERSA SEMANAL</div>
+            <div className="hdr-sub">Parras Valley Tomatoes - Pepino Persa</div>
+          </div>
+        </div>
+        <div className="view-tabs">
+          <button className={"view-tab "+(view==="diario"?"active":"")} onClick={function(){setView("diario");}}>Diario</button>
+          <button className={"view-tab "+(view==="semanal"?"active":"")} onClick={function(){setView("semanal");}}>Semanal</button>
+          <button className={"view-tab "+(view==="historial"?"active":"")} onClick={function(){setView("historial");}}>Historial</button>
+        </div>
+      </div>
+
+      <div className="wrap">
+
+        {/* DIARIO */}
+        {view==="diario"&&(
+          <div>
+            <div className="dias-tabs">
+              {DIAS.map(function(d,i){return(
+                <button key={d} className={"dia-btn "+(diaIdx===i?"active":"")} onClick={function(){setDiaIdx(i);}}>{d}</button>
+              );})}
+            </div>
+
+            <div className="sec">Ranchos  -  {DIAS[diaIdx]}</div>
+            <div className="ranchos">
+              {RANCHOS.map(function(r){
+                var rd=dia.ranchos[r.id];
+                var res=calcDia.res.find(function(x){return x.id===r.id;});
+                return(
+                  <div className="rancho-card" key={r.id}>
+                    <div className="rancho-head">{r.nombre}</div>
+                    <div className="rancho-body">
+                      <div className="f"><label>Rejas</label><input type="number" min="0" placeholder="0" value={rd.rejas} onChange={function(e){setRanchoField(diaIdx,r.id,"rejas",e.target.value);}}/></div>
+                      <div className="f"><label>Factor 1a</label><input type="number" min="0" step="0.001" placeholder="0.000" value={rd.factor_pri} onChange={function(e){setRanchoField(diaIdx,r.id,"factor_pri",e.target.value);}}/></div>
+                      <div className="f"><label>Factor 2a</label><input type="number" min="0" step="0.001" placeholder="0.000" value={rd.factor_seg} onChange={function(e){setRanchoField(diaIdx,r.id,"factor_seg",e.target.value);}}/></div>
+                    </div>
+                    {res.rejas>0&&(
+                      <div className="rancho-result">
+                        <div className="rr"><div className="rr-label">Rejas</div><div className="rr-val">{fmt(res.rejas,0)}</div></div>
+                        <div className="rr"><div className="rr-label">Bts 1a</div><div className="rr-val pri">{fmt(res.bultos_pri)}</div></div>
+                        <div className="rr"><div className="rr-label">Bts 2a</div><div className="rr-val seg">{fmt(res.bultos_seg)}</div></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="sec">Total proyectado</div>
+            <div className="total-ranchos">
+              <div className="tr-card rejas"><div className="tr-label">Rejas</div><div className="tr-val">{fmt(calcDia.tot_rejas,0)}</div><div className="tr-sub">total rejas</div></div>
+              <div className="tr-card pri"><div className="tr-label">Primera</div><div className="tr-val">{fmt(calcDia.tot_bPri)}</div><div className="tr-sub">{fmt(calcDia.tot_kgPri)} kg</div></div>
+              <div className="tr-card seg"><div className="tr-label">Segunda</div><div className="tr-val">{fmt(calcDia.tot_bSeg)}</div><div className="tr-sub">{fmt(calcDia.tot_kgSeg)} kg</div></div>
+            </div>
+
+            <div className="sec">Pedidos del dia</div>
+            <div className="pi-grid">
+              <TablaPI cat="pri" cls="pri" data={dia.pedidos} titulo="Pedido" onChange={function(cat,pid,val){setPedido(diaIdx,cat,pid,val);}}/>
+              <TablaPI cat="seg" cls="seg" data={dia.pedidos} titulo="Pedido" onChange={function(cat,pid,val){setPedido(diaIdx,cat,pid,val);}}/>
+            </div>
+
+            <div className="sec">Inventario disponible</div>
+            <div className="pi-grid">
+              <TablaPI cat="pri" cls="pri" data={dia.inventario} titulo="Inventario" onChange={function(cat,pid,val){setInv(diaIdx,cat,pid,val);}}/>
+              <TablaPI cat="seg" cls="seg" data={dia.inventario} titulo="Inventario" onChange={function(cat,pid,val){setInv(diaIdx,cat,pid,val);}}/>
+            </div>
+
+            <div className="sec">Cruce  -  Disponible vs Pedidos</div>
+            <div className="cruce-grid">
+              {[
+                {label:"Primera",disp:cruce.dispPri,ped:kgPedidos.pri,diff:cruce.diffPri,kgProy:calcDia.tot_kgPri,ki:kgInv.pri},
+                {label:"Segunda",disp:cruce.dispSeg,ped:kgPedidos.seg,diff:cruce.diffSeg,kgProy:calcDia.tot_kgSeg,ki:kgInv.seg}
+              ].map(function(x){
+                var cls2=x.ped===0?"neutral":x.diff>=0?"ok":"warn";
+                return(
+                  <div className={"cruce-card "+cls2} key={x.label}>
+                    <div className="cruce-label">{x.label}</div>
+                    <div className="cruce-val">{fmt(x.disp)} kg</div>
+                    <div className="cruce-sub">Proyectado {fmt(x.kgProy)} + Inv {fmt(x.ki)}</div>
+                    <div className="cruce-sub">Pedidos: {fmt(x.ped)} kg</div>
+                    <div className="cruce-diff" style={{color:x.diff>=0?"#69f0ae":"#ef5350"}}>
+                      {x.diff>=0?"+ Sobra ":"- Falta "}{fmt(Math.abs(x.diff))} kg
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* SEMANAL */}
+        {view==="semanal"&&(
+          <div>
+            <div className="sec">Resumen semanal  -  Viernes a Jueves</div>
+
+            {/* Calcular balance corrido */}
+            {(function(){
+              var balPri=0; var balSeg=0;
+              var dias=resumenSem.map(function(d){
+                // Pedidos del dia
+                var ped=semana[d.idx];
+                var pedKgPri=PRES.reduce(function(s,p){return s+nv(ped.pedidos.pri[p.id])*p.peso;},0);
+                var pedKgSeg=PRES.reduce(function(s,p){return s+nv(ped.pedidos.seg[p.id])*p.peso;},0);
+                var invKgPri=PRES.reduce(function(s,p){return s+nv(ped.inventario.pri[p.id])*p.peso;},0);
+                var invKgSeg=PRES.reduce(function(s,p){return s+nv(ped.inventario.seg[p.id])*p.peso;},0);
+                // Disponible hoy = produccion + inventario + sobrante de ayer
+                var dispPri=d.kgPri+invKgPri+balPri;
+                var dispSeg=d.kgSeg+invKgSeg+balSeg;
+                var diffPri=dispPri-pedKgPri;
+                var diffSeg=dispSeg-pedKgSeg;
+                // El sobrante (positivo) pasa al dia siguiente; si falta no se puede transferir
+                balPri=diffPri>0?diffPri:0;
+                balSeg=diffSeg>0?diffSeg:0;
+                return Object.assign({},d,{pedKgPri:pedKgPri,pedKgSeg:pedKgSeg,dispPri:dispPri,dispSeg:dispSeg,diffPri:diffPri,diffSeg:diffSeg,tieneDatos:d.rejas>0||pedKgPri>0||pedKgSeg>0});
+              });
+
+              return(
+                <div>
+                  {/* Tabla resumen */}
+                  <div style={{overflowX:"auto",marginBottom:16}}>
+                    <table className="sem-table" style={{minWidth:580}}>
+                      <thead>
+                        <tr>
+                          <th style={{textAlign:"left"}}>Dia</th>
+                          <th>Rejas</th>
+                          <th style={{color:"#69f0ae"}}>Kg 1a</th>
+                          <th style={{color:"#69f0ae"}}>Pedido 1a</th>
+                          <th style={{color:"#69f0ae"}}>Balance 1a</th>
+                          <th style={{color:"#ffcc02"}}>Kg 2a</th>
+                          <th style={{color:"#ffcc02"}}>Pedido 2a</th>
+                          <th style={{color:"#ffcc02"}}>Balance 2a</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dias.map(function(d){
+                          var okPri=d.diffPri>=0; var okSeg=d.diffSeg>=0;
+                          return(
+                            <tr key={d.dia} className={diaIdx===d.idx?"dia-activo":""} onClick={function(){setDiaIdx(d.idx);setView("diario");}}>
+                              <td style={{fontWeight:800,color:"#c8e6c9"}}>{d.dia}</td>
+                              <td>{d.rejas>0?fmt(d.rejas,0):<span style={{color:"rgba(255,255,255,0.2)"}}>--</span>}</td>
+                              <td style={{color:"#69f0ae"}}>{d.kgPri>0?fmt(d.kgPri):"--"}</td>
+                              <td style={{color:"rgba(105,240,174,0.6)"}}>{d.pedKgPri>0?fmt(d.pedKgPri):"--"}</td>
+                              <td>
+                                {d.tieneDatos
+                                  ?<span style={{fontWeight:900,color:okPri?"#69f0ae":"#ef5350",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:3}}>
+                                    <span>{okPri?"^":"v"}</span>
+                                    <span>{fmt(Math.abs(d.diffPri))}</span>
+                                  </span>
+                                  :<span style={{color:"rgba(255,255,255,0.2)"}}>--</span>
+                                }
+                              </td>
+                              <td style={{color:"#ffcc02"}}>{d.kgSeg>0?fmt(d.kgSeg):"--"}</td>
+                              <td style={{color:"rgba(255,204,2,0.6)"}}>{d.pedKgSeg>0?fmt(d.pedKgSeg):"--"}</td>
+                              <td>
+                                {d.tieneDatos
+                                  ?<span style={{fontWeight:900,color:okSeg?"#69f0ae":"#ef5350",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:3}}>
+                                    <span>{okSeg?"^":"v"}</span>
+                                    <span>{fmt(Math.abs(d.diffSeg))}</span>
+                                  </span>
+                                  :<span style={{color:"rgba(255,255,255,0.2)"}}>--</span>
+                                }
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        <tr className="total-sem">
+                          <td>TOTAL</td>
+                          <td>{fmt(totSem.rejas,0)}</td>
+                          <td>{fmt(totSem.kgPri)}</td>
+                          <td>--</td>
+                          <td></td>
+                          <td>{fmt(totSem.kgSeg)}</td>
+                          <td>--</td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Tarjetas de balance por dia */}
+                  <div className="sec">Balance corrido dia a dia</div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(120px,1fr))",gap:8,marginBottom:16}}>
+                    {dias.filter(function(d){return d.tieneDatos;}).map(function(d){
+                      var okPri=d.diffPri>=0; var okSeg=d.diffSeg>=0;
+                      var ambienOk=okPri&&okSeg; var ambienMal=!okPri&&!okSeg;
+                      var borde=ambienOk?"rgba(105,240,174,0.5)":ambienMal?"rgba(239,83,80,0.5)":"rgba(255,204,2,0.5)";
+                      var bg=ambienOk?"rgba(27,94,32,0.3)":ambienMal?"rgba(183,28,28,0.2)":"rgba(102,77,0,0.2)";
+                      return(
+                        <div key={d.dia} style={{background:bg,border:"2px solid "+borde,borderRadius:12,padding:"10px 10px",cursor:"pointer",textAlign:"center"}} onClick={function(){setDiaIdx(d.idx);setView("diario");}}>
+                          <div style={{fontSize:10,fontWeight:900,color:"#c8e6c9",letterSpacing:1,marginBottom:6}}>{d.dia.toUpperCase()}</div>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}}>
+                            <span style={{fontSize:9,color:"#69f0ae",fontWeight:700}}>1a</span>
+                            <span style={{fontSize:13,fontWeight:900,color:okPri?"#69f0ae":"#ef5350"}}>{okPri?"^":"v"} {fmt(Math.abs(d.diffPri),0)}</span>
+                          </div>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                            <span style={{fontSize:9,color:"#ffcc02",fontWeight:700}}>2a</span>
+                            <span style={{fontSize:13,fontWeight:900,color:okSeg?"#69f0ae":"#ef5350"}}>{okSeg?"^":"v"} {fmt(Math.abs(d.diffSeg),0)}</span>
+                          </div>
+                          {!ambienOk&&!ambienMal&&<div style={{fontSize:8,color:"rgba(255,255,255,0.4)",marginTop:4}}>mixto</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{fontSize:10,color:"#66bb6a",marginBottom:16,letterSpacing:1,opacity:0.7}}>
+                    ^ Sobra (kg) . v Falta (kg) . Lo que sobra de hoy se suma al disponible de manana
+                  </div>
+
+                  {/* CIERRE SEMANAL */}
+                  <div className="sec">Cierre de semana</div>
+                  {(function(){
+                    var totPedPri=dias.reduce(function(s,d){return s+d.pedKgPri;},0);
+                    var totPedSeg=dias.reduce(function(s,d){return s+d.pedKgSeg;},0);
+                    var totEmpPri=totSem.kgPri;
+                    var totEmpSeg=totSem.kgSeg;
+                    var difPri=totEmpPri-totPedPri;
+                    var difSeg=totEmpSeg-totPedSeg;
+                    var diasFaltaPri=dias.filter(function(d){return d.tieneDatos&&d.diffPri<0;}).length;
+                    var diasFaltaSeg=dias.filter(function(d){return d.tieneDatos&&d.diffSeg<0;}).length;
+                    var diasSobraPri=dias.filter(function(d){return d.tieneDatos&&d.diffPri>=0;}).length;
+                    return(
+                      <div style={{background:"linear-gradient(135deg,rgba(27,67,30,0.6),rgba(13,31,15,0.8))",border:"2px solid rgba(76,175,80,0.4)",borderRadius:16,padding:"18px",marginBottom:16}}>
+                        <div style={{fontSize:10,fontWeight:900,color:"#a8e063",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Balance de la semana  -  Viernes a Jueves</div>
+
+                        {/* Tabla resumen */}
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+                          {[
+                            {label:"Primera",pedKg:totPedPri,empKg:totEmpPri,dif:difPri,col:"#69f0ae",colFal:"#ef5350"},
+                            {label:"Segunda",pedKg:totPedSeg,empKg:totEmpSeg,dif:difSeg,col:"#ffcc02",colFal:"#ef5350"}
+                          ].map(function(x){
+                            var ok=x.dif>=0;
+                            return(
+                              <div key={x.label} style={{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px",border:"1px solid "+(ok?"rgba(105,240,174,0.2)":"rgba(239,83,80,0.2)")}}>
+                                <div style={{fontSize:9,fontWeight:900,color:x.col,letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>{x.label}</div>
+                                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                                  <span style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Empacado</span>
+                                  <span style={{fontSize:13,fontWeight:800,color:x.col}}>{fmt(x.empKg)} kg</span>
+                                </div>
+                                <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                                  <span style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>Pedidos</span>
+                                  <span style={{fontSize:13,fontWeight:800,color:"rgba(255,255,255,0.7)"}}>{fmt(x.pedKg)} kg</span>
+                                </div>
+                                <div style={{borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                  <span style={{fontSize:10,fontWeight:900,color:ok?"#69f0ae":"#ef5350"}}>{ok?"SOBRARON":"FALTARON"}</span>
+                                  <span style={{fontSize:18,fontWeight:900,color:ok?"#69f0ae":"#ef5350"}}>{ok?"^":"v"} {fmt(Math.abs(x.dif))} kg</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Dias con problemas */}
+                        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+                          <div style={{background:"rgba(0,0,0,0.2)",borderRadius:8,padding:"10px",textAlign:"center"}}>
+                            <div style={{fontSize:9,color:"#66bb6a",fontWeight:800,letterSpacing:1,marginBottom:4}}>REJAS SEMANA</div>
+                            <div style={{fontSize:22,fontWeight:900,color:"#90caf9"}}>{fmt(totSem.rejas,0)}</div>
+                          </div>
+                          <div style={{background:"rgba(0,0,0,0.2)",borderRadius:8,padding:"10px",textAlign:"center"}}>
+                            <div style={{fontSize:9,color:"#ef5350",fontWeight:800,letterSpacing:1,marginBottom:4}}>DIAS FALTA 1a</div>
+                            <div style={{fontSize:22,fontWeight:900,color:diasFaltaPri>0?"#ef5350":"#69f0ae"}}>{diasFaltaPri}</div>
+                            <div style={{fontSize:8,color:"rgba(255,255,255,0.3)"}}>{diasSobraPri} dias sobra</div>
+                          </div>
+                          <div style={{background:"rgba(0,0,0,0.2)",borderRadius:8,padding:"10px",textAlign:"center"}}>
+                            <div style={{fontSize:9,color:"#ef5350",fontWeight:800,letterSpacing:1,marginBottom:4}}>DIAS FALTA 2a</div>
+                            <div style={{fontSize:22,fontWeight:900,color:diasFaltaSeg>0?"#ef5350":"#69f0ae"}}>{diasFaltaSeg}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              );
+            })()}
+
+            <div className="hint">Toca cualquier dia para ir a su captura</div>
+            {!confirmNueva
+              ?<button className="btn-nueva" onClick={function(){setConfirmNueva(true);}}>Cerrar semana y guardar en historial</button>
+              :<div className="confirm-box">
+                <div className="confirm-msg">Confirmar cierre  -  se guardara en el historial y se limpiaran los datos</div>
+                <div className="confirm-btns">
+                  <button className="btn-cancel" onClick={function(){setConfirmNueva(false);}}>Cancelar</button>
+                  <button className="btn-confirm" onClick={nuevaSemana}>Confirmar cierre</button>
+                </div>
+              </div>
+            }
+          </div>
+        )}
+
+        {/* HISTORIAL */}
+        {view==="historial"&&(
+          <div>
+            <div className="sec">Historial de semanas</div>
+            {!historial.length
+              ?<div className="empty">Sin semanas cerradas aun</div>
+              :historial.map(function(h,i){return(
+                <div className="hist-card" key={h.ts||i}>
+                  <div>
+                    <div className="hist-fecha">{h.fecha}</div>
+                    <div className="hist-nums">Rejas: {fmt(h.totRejas,0)} . 1a: {fmt(h.totKgPri)} kg . 2a: {fmt(h.totKgSeg)} kg</div>
+                  </div>
+                  <div className="hist-bts">{fmt(h.totBPri+h.totBSeg)} bts</div>
+                </div>
+              );})}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
